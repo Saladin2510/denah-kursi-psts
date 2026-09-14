@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generator & Cetak Denah Tempat Duduk PTS / PSAJ</title>
-  <meta name="description" content="Aplikasi pembuat dan pencetak denah tempat duduk ujian (PTS/PSAJ) otomatis berbasis data Excel dengan pola saf mengular dan meja ganda.">
-  
+  <title>PSTS</title>
+  <meta name="description"
+    content="Aplikasi cetak denah tempat duduk ujian PSTS otomatis berbasis data Excel dengan pola saf mengular dan meja ganda.">
+
   <!-- Google Fonts: Inter & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- SheetJS Vendor Library -->
   <script src="vendor/xlsx.full.min.js"></script>
   <!-- Default Data Extracted from Excel -->
   <script src="data-default.js"></script>
-  
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- ================= TOP APP BAR (NO-PRINT) ================= -->
   <header class="app-header no-print">
@@ -31,19 +36,21 @@
           </svg>
         </div>
         <div class="brand-text">
-          <h1 class="brand-title">Denah Duduk PTS / PSAJ</h1>
-          <p class="brand-subtitle">Generator & Cetak Denah Tempat Duduk Ujian Berbasis Excel</p>
+          <h1 class="brand-title">PSTS</h1>
+          <p class="brand-subtitle">Denah Tempat Duduk Ujian PSTS Berbasis Excel</p>
         </div>
       </div>
 
       <!-- Quick Search Bar -->
       <div class="search-box-wrapper">
         <div class="search-input-group">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" id="globalStudentSearch" placeholder="Cari Nama Siswa / NIS / No Peserta..." autocomplete="off">
+          <input type="text" id="globalStudentSearch" placeholder="Cari Nama Siswa / NIS / No Peserta..."
+            autocomplete="off">
           <button id="clearSearchBtn" class="clear-search-btn" title="Hapus pencarian" style="display:none;">✕</button>
         </div>
         <!-- Search Results Dropdown -->
@@ -61,7 +68,7 @@
           <span>Unggah Excel</span>
           <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;">
         </label>
-        
+
         <button id="btnResetDefault" class="btn btn-outline" title="Kembalikan ke data bawaan 24 Ruangan">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="1 4 1 10 7 10" />
@@ -137,7 +144,8 @@
 
         <!-- Customization toggles -->
         <div class="custom-toggles">
-          <label class="toggle-label" title="Jika diaktifkan, meja paling depan selalu terisi penuh (meja kosong ditaruh di belakang)">
+          <label class="toggle-label"
+            title="Jika diaktifkan, meja paling depan selalu terisi penuh (meja kosong ditaruh di belakang)">
             <input type="checkbox" id="chkFillFront" checked>
             <span class="toggle-switch"></span>
             <span class="toggle-text">Kursi Depan Selalu Terisi</span>
@@ -243,11 +251,12 @@
   <!-- Footer (No Print) -->
   <footer class="app-footer no-print">
     <div class="footer-container">
-      <p>Denah Tempat Duduk PSTS / PSAJ • SMK / SMA • Siap Cetak A4 / F4</p>
+      <p>Denah Tempat Duduk PSTS • SMK / SMA • Siap Cetak A4 / F4</p>
       <p class="footer-note">Desain otomatis mengular (Saf 1 - 4) sesuai kaidah ruang ujian & presensi peserta.</p>
     </div>
   </footer>
 
   <script src="app.js"></script>
 </body>
+
 </html>

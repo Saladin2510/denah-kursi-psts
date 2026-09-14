@@ -1,10 +1,10 @@
 /**
- * DENAH TEMPAT DUDUK PTS / PSAJ - LOGIC & CONTROLLER
+ * DENAH TEMPAT DUDUK PSTS - LOGIC & CONTROLLER
  * Mengatur pemrosesan data Excel, algoritma denah mengular,
  * pencarian siswa multi-ruang, dan fungsi cetak A4/F4.
  */
 
-(function() {
+(function () {
   'use strict';
 
   // --- APPLICATION STATE ---
@@ -27,30 +27,30 @@
   const tableViewContainer = document.getElementById('tableViewContainer');
   const batchPrintContainer = document.getElementById('batchPrintContainer');
   const roomViewport = document.getElementById('roomViewport');
-  
+
   const globalStudentSearch = document.getElementById('globalStudentSearch');
   const searchResultsDropdown = document.getElementById('searchResultsDropdown');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
-  
+
   const excelFileInput = document.getElementById('excelFileInput');
   const btnResetDefault = document.getElementById('btnResetDefault');
   const btnPrintSingle = document.getElementById('btnPrintSingle');
   const btnPrintBatch = document.getElementById('btnPrintBatch');
-  
+
   const btnViewDenah = document.getElementById('btnViewDenah');
   const btnViewTable = document.getElementById('btnViewTable');
-  
+
   const chkFillFront = document.getElementById('chkFillFront');
   const chkShowArrows = document.getElementById('chkShowArrows');
   const selSupervisorPos = document.getElementById('selSupervisorPos');
   const selPaperSize = document.getElementById('selPaperSize');
-  
+
   const safBtnGroup = document.getElementById('safBtnGroup');
   const btnZoomOut = document.getElementById('btnZoomOut');
   const btnZoomIn = document.getElementById('btnZoomIn');
   const btnZoomFit = document.getElementById('btnZoomFit');
   const zoomLabel = document.getElementById('zoomLabel');
-  
+
   const notificationBanner = document.getElementById('notificationBanner');
   const searchHighlightToast = document.getElementById('searchHighlightToast');
   const toastStudentName = document.getElementById('toastStudentName');
@@ -407,8 +407,8 @@
       <div class="room-sheet ${isBatch ? 'room-print-page' : ''} ${isSafFocused ? 'room-sheet-saf-focused' : ''}" id="room-sheet-${currentRoom.code.replace(/\s+/g, '-')}">
         <!-- KOP UJIAN -->
         <div class="exam-kop">
-          <h2 class="kop-title">DENAH TEMPAT DUDUK PESERTA PSTS / PSAJ</h2>
-          <p class="kop-subtitle">PENILAIAN TENGAH SEMESTER • TAHUN AJARAN 2026/2027</p>
+          <h2 class="kop-title">DENAH TEMPAT DUDUK PESERTA PSTS</h2>
+          <p class="kop-subtitle">PENILAIAN SUMATIF TENGAH SEMESTER • TAHUN AJARAN 2026/2027</p>
           <div class="kop-meta-bar">
             <div class="meta-pill highlight">
               <strong>RUANG:</strong> <span>${currentRoom.no_ruang || currentRoom.code}</span>
@@ -878,7 +878,7 @@
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = function (evt) {
       try {
         const data = new Uint8Array(evt.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
