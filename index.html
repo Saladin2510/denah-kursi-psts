@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator & Cetak Denah Tempat Duduk PTS / PSAJ</title>
+  <meta name="description" content="Aplikasi pembuat dan pencetak denah tempat duduk ujian (PTS/PSAJ) otomatis berbasis data Excel dengan pola saf mengular dan meja ganda.">
+  
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- SheetJS Vendor Library -->
+  <script src="vendor/xlsx.full.min.js"></script>
+  <!-- Default Data Extracted from Excel -->
+  <script src="data-default.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ================= TOP APP BAR (NO-PRINT) ================= -->
+  <header class="app-header no-print">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <line x1="12" y1="4" x2="12" y2="20" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Denah Duduk PTS / PSAJ</h1>
+          <p class="brand-subtitle">Generator & Cetak Denah Tempat Duduk Ujian Berbasis Excel</p>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="search-box-wrapper">
+        <div class="search-input-group">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input type="text" id="globalStudentSearch" placeholder="Cari Nama Siswa / NIS / No Peserta..." autocomplete="off">
+          <button id="clearSearchBtn" class="clear-search-btn" title="Hapus pencarian" style="display:none;">✕</button>
+        </div>
+        <!-- Search Results Dropdown -->
+        <div id="searchResultsDropdown" class="search-results-dropdown" style="display: none;"></div>
+      </div>
+
+      <!-- Header Action Buttons -->
+      <div class="header-actions">
+        <label class="btn btn-secondary upload-btn" title="Unggah file Excel daftar pembagian ruang">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Unggah Excel</span>
+          <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;">
+        </label>
+        
+        <button id="btnResetDefault" class="btn btn-outline" title="Kembalikan ke data bawaan 24 Ruangan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+          </svg>
+          <span>Data Asli</span>
+        </button>
+
+        <button id="btnPrintSingle" class="btn btn-primary" title="Cetak Denah Ruang yang sedang dipilih (A4 / F4)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          <span>Cetak Ruang Ini</span>
+        </button>
+
+        <button id="btnPrintBatch" class="btn btn-warning" title="Cetak Seluruh Ruangan Sekaligus (Semua 24 Ruang)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg>
+          <span>Cetak Semua Ruang</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CONTROL PANEL & ROOM SELECTOR (NO-PRINT) ================= -->
+  <section class="control-panel no-print">
+    <div class="control-container">
+      <!-- Room Navigation Bar -->
+      <div class="room-nav-bar">
+        <button id="btnPrevRoom" class="room-nav-btn" title="Ruang Sebelumnya">◀</button>
+        <div class="room-selector-group">
+          <label for="roomSelect" class="room-select-label">PILIH RUANGAN:</label>
+          <select id="roomSelect" class="room-select-dropdown"></select>
+        </div>
+        <button id="btnNextRoom" class="room-nav-btn" title="Ruang Selanjutnya">▶</button>
+      </div>
+
+      <!-- Quick Room Pills (Horizontal scroll) -->
+      <div id="roomPillsContainer" class="room-pills-scroll"></div>
+
+      <!-- Settings & View Switcher -->
+      <div class="settings-toolbar">
+        <!-- View Toggle: Denah vs Daftar Hadir -->
+        <div class="view-toggle-group">
+          <button id="btnViewDenah" class="toggle-btn active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            <span>Tampilan Denah</span>
+          </button>
+          <button id="btnViewTable" class="toggle-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+            <span>Daftar Hadir / Rekap</span>
+          </button>
+        </div>
+
+        <!-- Customization toggles -->
+        <div class="custom-toggles">
+          <label class="toggle-label" title="Jika diaktifkan, meja paling depan selalu terisi penuh (meja kosong ditaruh di belakang)">
+            <input type="checkbox" id="chkFillFront" checked>
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">Kursi Depan Selalu Terisi</span>
+          </label>
+
+          <label class="toggle-label" title="Tampilkan arah panah alur mengular">
+            <input type="checkbox" id="chkShowArrows" checked>
+            <span class="toggle-switch"></span>
+            <span class="toggle-text">Panah Alur Ular</span>
+          </label>
+
+          <div class="select-small-group">
+            <label for="selSupervisorPos">Meja Pengawas:</label>
+            <select id="selSupervisorPos" class="select-sm">
+              <option value="right" selected>Kanan Depan</option>
+              <option value="left">Kiri Depan</option>
+            </select>
+          </div>
+
+          <div class="select-small-group">
+            <label for="selPaperSize">Kertas Cetak:</label>
+            <select id="selPaperSize" class="select-sm">
+              <option value="a4-portrait">A4 Portrait</option>
+              <option value="a4-landscape" selected>A4 Landscape</option>
+              <option value="f4-landscape">F4 / Folio Landscape</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notification Banner -->
+  <div id="notificationBanner" class="notification-banner no-print" style="display:none;"></div>
+
+  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <main class="main-content">
+    <!-- MOBILE ACTION BAR & SAF FILTER (NO-PRINT) -->
+    <div class="mobile-toolbar no-print">
+      <div class="mobile-saf-selector">
+        <span class="toolbar-label">Fokus Saf:</span>
+        <div class="saf-btn-group" id="safBtnGroup">
+          <button class="saf-btn active" data-saf="all">Semua Saf</button>
+          <button class="saf-btn" data-saf="0">Saf 1 (Kiri)</button>
+          <button class="saf-btn" data-saf="1">Saf 2</button>
+          <button class="saf-btn" data-saf="2">Saf 3</button>
+          <button class="saf-btn" data-saf="3">Saf 4 (Kanan)</button>
+        </div>
+      </div>
+
+      <div class="zoom-toolbar">
+        <span class="toolbar-label">Zoom Denah:</span>
+        <div class="zoom-btn-group">
+          <button id="btnZoomOut" class="btn-zoom" title="Perkecil">−</button>
+          <span id="zoomLabel" class="zoom-label">100%</span>
+          <button id="btnZoomIn" class="btn-zoom" title="Perbesar">+</button>
+          <button id="btnZoomFit" class="btn-zoom" title="Sesuaikan Layar">Fit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Scroll Hint -->
+    <div class="mobile-scroll-hint no-print">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+      <span>Geser denah ke samping untuk melihat seluruh 4 Saf, atau pilih tombol Saf di atas</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </div>
+
+    <!-- SINGLE ROOM VIEW CONTAINER DENGAN HORIZONTAL SCROLL VIEWPORT -->
+    <div class="room-viewport" id="roomViewport">
+      <div id="singleRoomContainer" class="room-sheet-wrapper">
+        <!-- RENDERED DINAMIS OLEH JS -->
+      </div>
+    </div>
+
+    <!-- TABLE / ATTENDANCE VIEW CONTAINER -->
+    <div id="tableViewContainer" class="table-view-container no-print" style="display:none;">
+      <!-- RENDERED DINAMIS OLEH JS -->
+    </div>
+
+    <!-- BATCH PRINT CONTAINER (HANYA DITAMPILKAN KETIKA MODE CETAK SEMUA DIAKTIFKAN) -->
+    <div id="batchPrintContainer" class="batch-print-container" style="display:none;">
+      <!-- RENDERED DINAMIS OLEH JS UNTUK SELURUH RUANGAN -->
+    </div>
+  </main>
+
+  <!-- Search Highlight Toast Modal -->
+  <div id="searchHighlightToast" class="search-highlight-toast" style="display:none;">
+    <div class="toast-content">
+      <div class="toast-icon">🎯</div>
+      <div class="toast-text">
+        <strong id="toastStudentName">-</strong>
+        <p id="toastStudentInfo">-</p>
+      </div>
+      <button id="toastCloseBtn" class="toast-close">✕</button>
+    </div>
+  </div>
+
+  <!-- Footer (No Print) -->
+  <footer class="app-footer no-print">
+    <div class="footer-container">
+      <p>Denah Tempat Duduk PSTS / PSAJ • SMK / SMA • Siap Cetak A4 / F4</p>
+      <p class="footer-note">Desain otomatis mengular (Saf 1 - 4) sesuai kaidah ruang ujian & presensi peserta.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
