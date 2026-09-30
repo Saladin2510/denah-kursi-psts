@@ -1,5 +1,5 @@
 /* =========================================================
-   DENAH TEMPAT DUDUK PSTS - STYLESHEET
+   DENAH TEMPAT DUDUK PTS / PSAJ - STYLESHEET
    Desain Modern, Responsif, Interaktif & Siap Cetak (A4/F4)
    ========================================================= */
 
@@ -7,41 +7,55 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Outfit', var(--font-sans);
   
-  /* Color Palette */
-  --bg-app: #f1f5f9;
-  --bg-card: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-light: #e2e8f0;
-  --border-dark: #cbd5e1;
+  /* Telkom Schools Brand Identity */
+  --telkom-red: #E1251B;
+  --telkom-red-hover: #C51D14;
+  --telkom-red-dark: #991B1B;
+  --telkom-red-light: #FFF1F2;
+  --telkom-red-border: #FECDD3;
   
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
+  --telkom-dark: #0F172A;
+  --telkom-slate: #1E293B;
+  --telkom-gray-subtle: #F8FAFC;
+  --telkom-gray-border: #E2E8F0;
+  --telkom-gray-text: #64748B;
   
-  --secondary: #0f172a;
-  --secondary-hover: #1e293b;
+  /* App Theme Variables */
+  --bg-app: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --border-light: #E2E8F0;
+  --border-dark: #CBD5E1;
   
-  /* Kelas X (Left) Theme */
-  --class-left-bg: #eef2ff;
-  --class-left-border: #818cf8;
-  --class-left-badge: #4338ca;
-  --class-left-text: #1e1b4b;
+  --primary: var(--telkom-red);
+  --primary-hover: var(--telkom-red-hover);
+  --primary-light: var(--telkom-red-light);
   
-  /* Kelas XI (Right) Theme */
-  --class-right-bg: #ecfdf5;
-  --class-right-border: #34d399;
+  --secondary: #1E293B;
+  --secondary-hover: #0F172A;
+  
+  /* Kelas X (Left) Theme - Sleek Indigo / Blue */
+  --class-left-bg: #EEF2FF;
+  --class-left-border: #818CF8;
+  --class-left-badge: #4338CA;
+  --class-left-text: #1E1B4B;
+  
+  /* Kelas XI (Right) Theme - Emerald / Teal */
+  --class-right-bg: #ECFDF5;
+  --class-right-border: #34D399;
   --class-right-badge: #047857;
-  --class-right-text: #064e3b;
+  --class-right-text: #064E3B;
 
   /* Empty Seat Theme */
-  --seat-empty-bg: #f8fafc;
-  --seat-empty-border: #cbd5e1;
-  --seat-empty-text: #94a3b8;
+  --seat-empty-bg: #F8FAFC;
+  --seat-empty-border: #CBD5E1;
+  --seat-empty-text: #94A3B8;
   
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.07);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-red: 0 4px 14px 0 rgba(225, 37, 27, 0.25);
   
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -66,17 +80,17 @@ body {
 /* ================= HEADER ================= */
 .app-header {
   background: #ffffff;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1.5px solid var(--border-light);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
 }
 
 .header-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 10px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -90,29 +104,97 @@ body {
   gap: 12px;
 }
 
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #1e293b, #3b82f6);
-  color: #fff;
+.brand-logo-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  text-decoration: none;
+}
+
+.brand-logo-img {
+  height: 38px;
+  max-width: 200px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.brand-logo-img:hover {
+  transform: scale(1.02);
+}
+
+.brand-divider {
+  width: 1.5px;
+  height: 32px;
+  background: var(--border-dark);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.brand-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--telkom-red);
+  background: var(--telkom-red-light);
+  border: 1px solid var(--telkom-red-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.brand-year-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  border: 1px solid var(--border-dark);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.brand-year-pill:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: var(--telkom-red);
+}
+
+.year-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.15); }
 }
 
 .brand-title {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.02em;
-}
-
-.brand-subtitle {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 /* Search Box */
@@ -242,28 +324,55 @@ body {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: var(--telkom-red);
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  background: var(--telkom-red-hover);
+  box-shadow: 0 4px 10px rgba(225, 37, 27, 0.32);
+  transform: translateY(-1px);
+}
+
+.btn-dark-accent {
+  background: var(--telkom-dark);
+  color: #ffffff;
+  border: 1px solid #334155;
+}
+
+.btn-dark-accent:hover {
+  background: var(--telkom-slate);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-config {
+  background: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  color: var(--telkom-dark);
+}
+
+.btn-config:hover {
+  background: var(--telkom-red-light);
+  border-color: var(--telkom-red);
+  color: var(--telkom-red);
+  box-shadow: 0 2px 8px rgba(225, 37, 27, 0.15);
 }
 
 .btn-secondary {
   background: #f8fafc;
-  border-color: var(--border-dark);
+  border: 1.5px solid var(--border-dark);
   color: var(--text-main);
 }
 
 .btn-secondary:hover {
   background: #e2e8f0;
+  border-color: #94a3b8;
 }
 
 .btn-outline {
   background: transparent;
-  border-color: var(--border-dark);
+  border: 1.5px solid var(--border-dark);
   color: var(--text-muted);
 }
 
@@ -341,11 +450,17 @@ body {
   font-size: 0.92rem;
   font-weight: 600;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--primary);
+  border: 2px solid var(--telkom-red);
   background: #ffffff;
   color: var(--text-main);
   cursor: pointer;
   min-width: 280px;
+  transition: box-shadow 0.2s ease;
+}
+
+.room-select-dropdown:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(225, 37, 27, 0.2);
 }
 
 /* Room Pills */
@@ -358,14 +473,31 @@ body {
 }
 
 .room-pill {
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: #f8fafc;
   border: 1px solid var(--border-light);
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.room-pill:hover {
+  background: #f1f5f9;
+  color: var(--text-main);
+  border-color: var(--border-dark);
+}
+
+.room-pill.active {
+  background: linear-gradient(135deg, var(--telkom-red) 0%, var(--telkom-red-dark) 100%);
+  border-color: var(--telkom-red-dark);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(225, 37, 27, 0.35);
+}
   white-space: nowrap;
   transition: all 0.15s ease;
 }
@@ -539,6 +671,139 @@ body {
   position: relative;
 }
 
+/* Official Exam Kop - Telkom Schools Purwokerto */
+.exam-kop.official-kop {
+  text-align: left;
+  border-bottom: none;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.kop-header-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 6px;
+}
+
+.kop-logo-wrapper {
+  width: 175px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.kop-school-logo {
+  max-width: 175px;
+  max-height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.kop-text-wrapper {
+  flex: 1;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.kop-org-title {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.kop-school-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--telkom-red);
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.kop-exam-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--telkom-dark);
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.kop-exam-sub {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: 0.02em;
+  margin-top: 1px;
+}
+
+.kop-address-text {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 3px;
+}
+
+.kop-room-badge-wrap {
+  width: 155px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.kop-room-badge-large {
+  border: 2px solid var(--telkom-red);
+  border-radius: var(--radius-md);
+  background: var(--telkom-red-light);
+  padding: 6px 14px;
+  text-align: center;
+  min-width: 125px;
+  box-shadow: 0 2px 6px rgba(225, 37, 27, 0.12);
+}
+
+.kr-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--telkom-red);
+  text-transform: uppercase;
+}
+
+.kr-code {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--telkom-dark);
+  line-height: 1.05;
+}
+
+.kr-subname {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Double divider line classic official school */
+.kop-divider-double {
+  border-top: 2.5px solid var(--telkom-dark);
+  border-bottom: 1.2px solid var(--telkom-red);
+  height: 4px;
+  margin: 6px 0 10px 0;
+}
+
 .kop-title {
   font-family: var(--font-display);
   font-size: 1.35rem;
@@ -560,11 +825,11 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid #e2e8f0;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .meta-pill {
@@ -575,6 +840,7 @@ body {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
+  font-size: 0.78rem;
 }
 
 .meta-pill strong {
@@ -582,9 +848,27 @@ body {
 }
 
 .meta-pill.highlight {
-  background: #e0e7ff;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.meta-pill.pill-class-left {
+  background: #eef2ff;
   border-color: #c7d2fe;
   color: #312e81;
+}
+
+.meta-pill.pill-class-right {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #064e3b;
+}
+
+.meta-pill.pill-period {
+  background: var(--telkom-red-light);
+  border-color: var(--telkom-red-border);
+  color: var(--telkom-red-dark);
 }
 
 /* ================= CLASSROOM FRONT AREA ================= */
@@ -915,7 +1199,7 @@ body {
 /* ================= SIGNATURE & FOOTER FOR EXAM ================= */
 .exam-signature-area {
   margin-top: 16px;
-  padding-top: 14px;
+  padding-top: 12px;
   border-top: 1.5px solid #cbd5e1;
   display: flex;
   justify-content: space-between;
@@ -932,12 +1216,27 @@ body {
   color: #0f172a;
   display: block;
   margin-bottom: 2px;
+  font-size: 0.76rem;
 }
 
 .exam-rules-note ol {
   padding-left: 18px;
   font-size: 0.72rem;
   line-height: 1.35;
+}
+
+.signature-date-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.sig-location-date {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
 }
 
 .signature-boxes {
@@ -947,14 +1246,14 @@ body {
 }
 
 .sig-col {
-  width: 150px;
+  width: 145px;
   font-size: 0.75rem;
 }
 
 .sig-title {
   font-weight: 600;
   color: #334155;
-  margin-bottom: 45px;
+  margin-bottom: 42px;
 }
 
 .sig-line {
@@ -983,6 +1282,15 @@ body {
   margin-bottom: 16px;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.table-school-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--telkom-red);
+  text-transform: uppercase;
+  margin-bottom: 3px;
 }
 
 .table-header-title h2 {
@@ -1076,14 +1384,299 @@ body {
 /* App Footer */
 .app-footer {
   text-align: center;
-  padding: 24px 20px 40px;
+  padding: 32px 20px 48px;
   font-size: 0.8rem;
   color: var(--text-muted);
+  border-top: 1px solid var(--border-light);
+  margin-top: 32px;
+  background: #ffffff;
+}
+
+.footer-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.footer-brand-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.footer-logo {
+  height: 32px;
+  object-fit: contain;
+}
+
+.footer-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--telkom-dark);
+}
+
+.footer-info {
+  font-size: 0.82rem;
+  color: #475569;
 }
 
 .footer-note {
   font-size: 0.74rem;
-  margin-top: 4px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* =========================================================
+   EXAM CONFIGURATION MODAL DIALOG
+   ========================================================= */
+dialog.config-modal {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0;
+  background: #ffffff;
+  color: var(--text-main);
+  max-width: 700px;
+  width: 94%;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  margin: auto;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+dialog.config-modal::backdrop {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.config-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+}
+
+.config-modal-header {
+  background: #ffffff;
+  border-bottom: 1.5px solid var(--border-light);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--telkom-red-light);
+  color: var(--telkom-red);
+  border: 1px solid var(--telkom-red-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--telkom-dark);
+}
+
+.modal-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f1f5f9;
+  color: var(--telkom-red);
+}
+
+.config-modal-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-section {
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: #ffffff;
+}
+
+.section-legend {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--telkom-dark);
+  padding: 0 8px;
+  letter-spacing: 0.02em;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.form-label .required {
+  color: var(--telkom-red);
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  color: var(--text-main);
+  background: #f8fafc;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  transition: all 0.18s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--telkom-red);
+  box-shadow: 0 0 0 3px rgba(225, 37, 27, 0.15);
+}
+
+.form-textarea {
+  resize: vertical;
+  line-height: 1.4;
+  min-height: 68px;
+}
+
+.quick-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.chips-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.year-chip {
+  background: #f1f5f9;
+  border: 1px solid var(--border-light);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.year-chip:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: var(--telkom-red);
+}
+
+.year-chip.active {
+  background: var(--telkom-red);
+  color: #ffffff;
+  border-color: var(--telkom-red);
+}
+
+.form-group-checkbox {
+  margin-top: 8px;
+  padding: 4px 0;
+}
+
+.config-modal-footer {
+  background: #f8fafc;
+  border-top: 1.5px solid var(--border-light);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.modal-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-save {
+  padding: 8px 18px;
+  font-weight: 700;
 }
 
 /* =========================================================
@@ -1098,7 +1691,8 @@ body {
   .app-footer,
   .search-highlight-toast,
   .notification-banner,
-  .table-view-container {
+  .table-view-container,
+  dialog.config-modal {
     display: none !important;
   }
 
@@ -1132,33 +1726,142 @@ body {
     break-after: auto;
   }
 
-  .exam-kop {
-    padding-bottom: 6px !important;
-    margin-bottom: 8px !important;
-    border-bottom: 2px solid #000000 !important;
+  /* Official Kop Printing */
+  .exam-kop.official-kop {
+    padding-bottom: 2px !important;
+    margin-bottom: 4px !important;
+    border-bottom: none !important;
   }
 
-  .kop-title {
+  .kop-header-layout {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding-bottom: 2px !important;
+  }
+
+  .kop-logo-wrapper {
+    width: 135px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .kop-school-logo {
+    max-width: 135px !important;
+    max-height: 40px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .kop-text-wrapper {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  .kop-org-title {
+    font-size: 7pt !important;
+    color: #444444 !important;
+    letter-spacing: 0.1em !important;
+    font-weight: 700 !important;
+  }
+
+  .kop-school-name {
     font-size: 13pt !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+  }
+
+  .kop-exam-title {
+    font-size: 10pt !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    margin-top: 1px !important;
+  }
+
+  .kop-exam-sub {
+    font-size: 8pt !important;
+    color: #222222 !important;
+    font-weight: 600 !important;
+  }
+
+  .kop-address-text {
+    font-size: 6pt !important;
+    color: #555555 !important;
+    font-style: italic !important;
+  }
+
+  .kop-room-badge-wrap {
+    width: 110px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  .kop-room-badge-large {
+    border: 1.5px solid #000000 !important;
+    background: #ffffff !important;
+    padding: 2px 8px !important;
+    min-width: 90px !important;
+    box-shadow: none !important;
+  }
+
+  .kr-label {
+    font-size: 6pt !important;
     color: #000000 !important;
   }
 
-  .kop-subtitle {
-    font-size: 9.5pt !important;
-    color: #222222 !important;
+  .kr-code {
+    font-size: 12pt !important;
+    color: #000000 !important;
+  }
+
+  .kr-subname {
+    font-size: 6pt !important;
+    color: #333333 !important;
+  }
+
+  .kop-divider-double {
+    border-top: 2pt solid #000000 !important;
+    border-bottom: 1pt solid #000000 !important;
+    height: 3px !important;
+    margin: 3px 0 5px 0 !important;
   }
 
   .kop-meta-bar {
-    font-size: 8.5pt !important;
-    margin-top: 4px !important;
-    padding-top: 4px !important;
+    font-size: 8pt !important;
+    margin-top: 3px !important;
+    padding-top: 3px !important;
     border-top: 1px solid #666666 !important;
   }
 
   .meta-pill {
     background: #ffffff !important;
     border: 1px solid #000000 !important;
-    padding: 2px 6px !important;
+    color: #000000 !important;
+    padding: 1px 5px !important;
+  }
+
+  .meta-pill.highlight,
+  .meta-pill.pill-class-left,
+  .meta-pill.pill-class-right,
+  .meta-pill.pill-period {
+    background: #ffffff !important;
+    border-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  .signature-date-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 3px !important;
+  }
+
+  .sig-location-date {
+    font-size: 7.5pt !important;
+    font-weight: 600 !important;
+    color: #000000 !important;
   }
 
   .classroom-front {

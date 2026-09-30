@@ -1,11 +1,72 @@
 /**
- * DENAH TEMPAT DUDUK PSTS - LOGIC & CONTROLLER
+ * DENAH TEMPAT DUDUK PTS / PSAJ - LOGIC & CONTROLLER
  * Mengatur pemrosesan data Excel, algoritma denah mengular,
- * pencarian siswa multi-ruang, dan fungsi cetak A4/F4.
+ * pengaturan dinamis tahun ajaran/ujian, dan cetak A4/F4 resmi SMK Telkom Purwokerto.
  */
 
-(function () {
+(function() {
   'use strict';
+
+  // --- PERSISTENCE & CONFIGURATION ---
+  const STORAGE_CONFIG_KEY = 'smk_telkom_pwt_denah_config_v1';
+
+  const DEFAULT_EXAM_CONFIG = {
+    academicYear: '2026/2027',
+    semester: 'Ganjil',
+    examType: 'PSTS',
+    examShortCode: 'PSTS',
+    examTitle: 'DENAH TEMPAT DUDUK PESERTA PSTS',
+    examSubtitle: 'PENILAIAN SUMATIF TENGAH SEMESTER • TAHUN PELAJARAN 2026/2027',
+    foundationName: 'YAYASAN PENDIDIKAN TELKOM',
+    schoolName: 'SMK TELKOM PURWOKERTO',
+    schoolAddress: 'Jl. D.I. Panjaitan No. 128 Purwokerto 53147 • Telp. (0281) 632138 • www.smktelkom-pwt.sch.id',
+    showLogo: true,
+    locationDate: 'Purwokerto, September 2026',
+    supervisor1Title: 'Pengawas Ruang 1',
+    supervisor1Nip: 'NIP. .....................................',
+    supervisor2Title: 'Pengawas Ruang 2',
+    supervisor2Nip: 'NIP. .....................................',
+    examRules: [
+      'Siswa duduk sesuai denah dan nomor urut presensi yang telah ditentukan panitia.',
+      'Dilarang menukar posisi tempat duduk tanpa izin Pengawas Ruang.',
+      'Tas, buku, dan gawai/HP diletakkan di depan kelas di bawah papan tulis.'
+    ]
+  };
+
+  const EXAM_PRESETS = {
+    PSTS: {
+      shortCode: 'PSTS',
+      title: 'DENAH TEMPAT DUDUK PESERTA PSTS',
+      subtitle: (year, sem) => `PENILAIAN SUMATIF TENGAH SEMESTER (${sem.toUpperCase()}) • TAHUN PELAJARAN ${year}`
+    },
+    PSAJ: {
+      shortCode: 'PSAJ',
+      title: 'DENAH TEMPAT DUDUK PESERTA PSAJ',
+      subtitle: (year, sem) => `PENILAIAN SUMATIF AKHIR JENJANG (KELAS XII) • TAHUN PELAJARAN ${year}`
+    },
+    PSAS: {
+      shortCode: 'PSAS',
+      title: 'DENAH TEMPAT DUDUK PESERTA PSAS',
+      subtitle: (year, sem) => `PENILAIAN SUMATIF AKHIR SEMESTER (${sem.toUpperCase()}) • TAHUN PELAJARAN ${year}`
+    },
+    PTS: {
+      shortCode: 'PTS',
+      title: 'DENAH TEMPAT DUDUK PESERTA PTS',
+      subtitle: (year, sem) => `PENILAIAN TENGAH SEMESTER (${sem.toUpperCase()}) • TAHUN PELAJARAN ${year}`
+    },
+    PAS: {
+      shortCode: 'PAS',
+      title: 'DENAH TEMPAT DUDUK PESERTA PAS',
+      subtitle: (year, sem) => `PENILAIAN AKHIR SEMESTER (${sem.toUpperCase()}) • TAHUN PELAJARAN ${year}`
+    },
+    PAT: {
+      shortCode: 'PAT',
+      title: 'DENAH TEMPAT DUDUK PESERTA PAT',
+      subtitle: (year, sem) => `PENILAIAN AKHIR TAHUN • TAHUN PELAJARAN ${year}`
+    }
+  };
+
+  let examConfig = loadExamConfig();
 
   // --- APPLICATION STATE ---
   let roomsData = [];
@@ -27,35 +88,60 @@
   const tableViewContainer = document.getElementById('tableViewContainer');
   const batchPrintContainer = document.getElementById('batchPrintContainer');
   const roomViewport = document.getElementById('roomViewport');
-
+  
   const globalStudentSearch = document.getElementById('globalStudentSearch');
   const searchResultsDropdown = document.getElementById('searchResultsDropdown');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
-
+  
   const excelFileInput = document.getElementById('excelFileInput');
   const btnResetDefault = document.getElementById('btnResetDefault');
   const btnPrintSingle = document.getElementById('btnPrintSingle');
   const btnPrintBatch = document.getElementById('btnPrintBatch');
-
+  
   const btnViewDenah = document.getElementById('btnViewDenah');
   const btnViewTable = document.getElementById('btnViewTable');
-
+  
   const chkFillFront = document.getElementById('chkFillFront');
   const chkShowArrows = document.getElementById('chkShowArrows');
   const selSupervisorPos = document.getElementById('selSupervisorPos');
   const selPaperSize = document.getElementById('selPaperSize');
-
+  
   const safBtnGroup = document.getElementById('safBtnGroup');
   const btnZoomOut = document.getElementById('btnZoomOut');
   const btnZoomIn = document.getElementById('btnZoomIn');
   const btnZoomFit = document.getElementById('btnZoomFit');
   const zoomLabel = document.getElementById('zoomLabel');
-
+  
   const notificationBanner = document.getElementById('notificationBanner');
   const searchHighlightToast = document.getElementById('searchHighlightToast');
   const toastStudentName = document.getElementById('toastStudentName');
   const toastStudentInfo = document.getElementById('toastStudentInfo');
   const toastCloseBtn = document.getElementById('toastCloseBtn');
+
+  // Config Modal Elements
+  const examConfigModal = document.getElementById('examConfigModal');
+  const btnOpenConfigModal = document.getElementById('btnOpenConfigModal');
+  const btnQuickConfigYear = document.getElementById('btnQuickConfigYear');
+  const headerAcademicYearBadge = document.getElementById('headerAcademicYearBadge');
+  const btnCloseConfigModal = document.getElementById('btnCloseConfigModal');
+  const btnCancelConfig = document.getElementById('btnCancelConfig');
+  const btnResetConfigDefaults = document.getElementById('btnResetConfigDefaults');
+  const examConfigForm = document.getElementById('examConfigForm');
+
+  const cfgAcademicYear = document.getElementById('cfgAcademicYear');
+  const cfgSemester = document.getElementById('cfgSemester');
+  const cfgExamPreset = document.getElementById('cfgExamPreset');
+  const cfgExamShortCode = document.getElementById('cfgExamShortCode');
+  const cfgExamTitle = document.getElementById('cfgExamTitle');
+  const cfgExamSubtitle = document.getElementById('cfgExamSubtitle');
+  const cfgFoundationName = document.getElementById('cfgFoundationName');
+  const cfgSchoolName = document.getElementById('cfgSchoolName');
+  const cfgSchoolAddress = document.getElementById('cfgSchoolAddress');
+  const cfgShowLogo = document.getElementById('cfgShowLogo');
+  const cfgLocationDate = document.getElementById('cfgLocationDate');
+  const cfgSupervisor1 = document.getElementById('cfgSupervisor1');
+  const cfgSupervisor2 = document.getElementById('cfgSupervisor2');
+  const cfgExamRules = document.getElementById('cfgExamRules');
 
   // --- INITIALIZATION ---
   function init() {
@@ -66,10 +152,13 @@
       roomsData = generateFallbackData();
     }
 
-    // 2. Pasang event listeners
+    // 2. Perbarui badge header tahun ajaran
+    updateHeaderYearBadge();
+
+    // 3. Pasang event listeners
     bindEvents();
 
-    // 3. Render kontrol dan denah pertama kali
+    // 4. Render kontrol dan denah pertama kali
     updateRoomSelectorUI();
     renderCurrentRoom();
   }
@@ -198,6 +287,275 @@
     if (btnZoomFit) {
       btnZoomFit.addEventListener('click', zoomFit);
     }
+
+    // Modal Pengaturan Tahun Ajaran & Ujian
+    if (btnOpenConfigModal) {
+      btnOpenConfigModal.addEventListener('click', openConfigModal);
+    }
+    if (btnQuickConfigYear) {
+      btnQuickConfigYear.addEventListener('click', openConfigModal);
+    }
+    if (btnCloseConfigModal) {
+      btnCloseConfigModal.addEventListener('click', closeConfigModal);
+    }
+    if (btnCancelConfig) {
+      btnCancelConfig.addEventListener('click', closeConfigModal);
+    }
+    if (examConfigModal) {
+      examConfigModal.addEventListener('click', (e) => {
+        const rect = examConfigModal.getBoundingClientRect();
+        const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.top + rect.height
+          && rect.left <= e.clientX && e.clientX <= rect.left + rect.width);
+        if (!isInDialog) {
+          closeConfigModal();
+        }
+      });
+    }
+    if (examConfigForm) {
+      examConfigForm.addEventListener('submit', handleConfigFormSubmit);
+    }
+    if (cfgExamPreset) {
+      cfgExamPreset.addEventListener('change', onPresetChanged);
+    }
+    if (cfgAcademicYear) {
+      cfgAcademicYear.addEventListener('input', onYearOrSemesterInputChanged);
+    }
+    if (cfgSemester) {
+      cfgSemester.addEventListener('change', onYearOrSemesterInputChanged);
+    }
+    if (examConfigModal) {
+      examConfigModal.querySelectorAll('.year-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          if (cfgAcademicYear) {
+            cfgAcademicYear.value = chip.dataset.year;
+            onYearOrSemesterInputChanged();
+          }
+        });
+      });
+    }
+    if (btnResetConfigDefaults) {
+      btnResetConfigDefaults.addEventListener('click', resetConfigDefaults);
+    }
+  }
+
+  // --- CONFIGURATION MANAGEMENT (LOCALSTORAGE & MODAL) ---
+  function loadExamConfig() {
+    try {
+      const saved = localStorage.getItem(STORAGE_CONFIG_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return Object.assign({}, DEFAULT_EXAM_CONFIG, parsed);
+      }
+    } catch (e) {
+      console.warn('Gagal memuat examConfig dari localStorage:', e);
+    }
+    return Object.assign({}, DEFAULT_EXAM_CONFIG);
+  }
+
+  function saveExamConfig(newConfig) {
+    examConfig = Object.assign({}, examConfig, newConfig);
+    try {
+      localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify(examConfig));
+    } catch (e) {
+      console.warn('Gagal menyimpan examConfig ke localStorage:', e);
+    }
+    updateHeaderYearBadge();
+  }
+
+  function updateHeaderYearBadge() {
+    const badge = document.getElementById('headerAcademicYearBadge');
+    if (badge && examConfig) {
+      const code = examConfig.examShortCode || examConfig.examType || 'UJIAN';
+      badge.textContent = `T.A. ${examConfig.academicYear} • ${examConfig.semester} (${code})`;
+    }
+  }
+
+  function openConfigModal() {
+    if (!examConfigModal) return;
+
+    // Populate modal inputs with current state
+    if (cfgAcademicYear) cfgAcademicYear.value = examConfig.academicYear || '';
+    if (cfgSemester) cfgSemester.value = examConfig.semester || 'Ganjil';
+    if (cfgExamPreset) {
+      const presetFound = Object.keys(EXAM_PRESETS).includes(examConfig.examType);
+      cfgExamPreset.value = presetFound ? examConfig.examType : 'CUSTOM';
+    }
+    if (cfgExamShortCode) cfgExamShortCode.value = examConfig.examShortCode || '';
+    if (cfgExamTitle) cfgExamTitle.value = examConfig.examTitle || '';
+    if (cfgExamSubtitle) cfgExamSubtitle.value = examConfig.examSubtitle || '';
+    if (cfgFoundationName) cfgFoundationName.value = examConfig.foundationName || '';
+    if (cfgSchoolName) cfgSchoolName.value = examConfig.schoolName || '';
+    if (cfgSchoolAddress) cfgSchoolAddress.value = examConfig.schoolAddress || '';
+    if (cfgShowLogo) cfgShowLogo.checked = (examConfig.showLogo !== false);
+    if (cfgLocationDate) cfgLocationDate.value = examConfig.locationDate || '';
+    if (cfgSupervisor1) cfgSupervisor1.value = examConfig.supervisor1Title || '';
+    if (cfgSupervisor2) cfgSupervisor2.value = examConfig.supervisor2Title || '';
+    if (cfgExamRules) {
+      cfgExamRules.value = Array.isArray(examConfig.examRules)
+        ? examConfig.examRules.join('\n')
+        : (examConfig.examRules || '');
+    }
+
+    // Highlight active chip
+    examConfigModal.querySelectorAll('.year-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.year === examConfig.academicYear);
+    });
+
+    if (typeof examConfigModal.showModal === 'function') {
+      examConfigModal.showModal();
+    } else {
+      examConfigModal.setAttribute('open', '');
+    }
+  }
+
+  function closeConfigModal() {
+    if (!examConfigModal) return;
+    if (typeof examConfigModal.close === 'function') {
+      examConfigModal.close();
+    } else {
+      examConfigModal.removeAttribute('open');
+    }
+  }
+
+  function onPresetChanged() {
+    const selected = cfgExamPreset.value;
+    const year = (cfgAcademicYear ? cfgAcademicYear.value.trim() : '') || examConfig.academicYear;
+    const sem = (cfgSemester ? cfgSemester.value : '') || examConfig.semester;
+
+    if (selected && EXAM_PRESETS[selected]) {
+      const p = EXAM_PRESETS[selected];
+      if (cfgExamShortCode) cfgExamShortCode.value = p.shortCode;
+      if (cfgExamTitle) cfgExamTitle.value = p.title;
+      if (cfgExamSubtitle) cfgExamSubtitle.value = p.subtitle(year, sem);
+    }
+  }
+
+  function onYearOrSemesterInputChanged() {
+    const year = (cfgAcademicYear ? cfgAcademicYear.value.trim() : '') || '2026/2027';
+    const sem = (cfgSemester ? cfgSemester.value : '') || 'Ganjil';
+    const presetKey = cfgExamPreset ? cfgExamPreset.value : '';
+
+    // Update active chip state
+    if (examConfigModal) {
+      examConfigModal.querySelectorAll('.year-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.year === year);
+      });
+    }
+
+    if (presetKey && EXAM_PRESETS[presetKey]) {
+      if (cfgExamSubtitle) {
+        cfgExamSubtitle.value = EXAM_PRESETS[presetKey].subtitle(year, sem);
+      }
+    }
+  }
+
+  function handleConfigFormSubmit(e) {
+    e.preventDefault();
+
+    const rawRules = cfgExamRules ? cfgExamRules.value.trim() : '';
+    const rulesList = rawRules
+      ? rawRules.split('\n').map(s => s.trim()).filter(Boolean)
+      : DEFAULT_EXAM_CONFIG.examRules;
+
+    const newCfg = {
+      academicYear: cfgAcademicYear ? cfgAcademicYear.value.trim() || '2026/2027' : '2026/2027',
+      semester: cfgSemester ? cfgSemester.value : 'Ganjil',
+      examType: cfgExamPreset ? cfgExamPreset.value : 'PSTS',
+      examShortCode: cfgExamShortCode ? cfgExamShortCode.value.trim() || 'PSTS' : 'PSTS',
+      examTitle: cfgExamTitle ? cfgExamTitle.value.trim() || 'DENAH TEMPAT DUDUK PESERTA PSTS' : 'DENAH TEMPAT DUDUK PESERTA PSTS',
+      examSubtitle: cfgExamSubtitle ? cfgExamSubtitle.value.trim() || '' : '',
+      foundationName: cfgFoundationName ? cfgFoundationName.value.trim() || 'YAYASAN PENDIDIKAN TELKOM' : 'YAYASAN PENDIDIKAN TELKOM',
+      schoolName: cfgSchoolName ? cfgSchoolName.value.trim() || 'SMK TELKOM PURWOKERTO' : 'SMK TELKOM PURWOKERTO',
+      schoolAddress: cfgSchoolAddress ? cfgSchoolAddress.value.trim() : '',
+      showLogo: cfgShowLogo ? cfgShowLogo.checked : true,
+      locationDate: cfgLocationDate ? cfgLocationDate.value.trim() : 'Purwokerto',
+      supervisor1Title: cfgSupervisor1 ? cfgSupervisor1.value.trim() || 'Pengawas Ruang 1' : 'Pengawas Ruang 1',
+      supervisor2Title: cfgSupervisor2 ? cfgSupervisor2.value.trim() || 'Pengawas Ruang 2' : 'Pengawas Ruang 2',
+      examRules: rulesList
+    };
+
+    saveExamConfig(newCfg);
+    closeConfigModal();
+
+    // Re-render views
+    if (activeView === 'denah') {
+      renderCurrentRoom();
+    } else {
+      renderTableView();
+    }
+
+    showNotification(`Pengaturan Kop & Tahun Ajaran (${newCfg.academicYear} • ${newCfg.semester}) berhasil disimpan!`, 'success');
+  }
+
+  function resetConfigDefaults() {
+    if (confirm('Kembalikan seluruh pengaturan tahun ajaran dan kop ujian ke bawaan SMK Telkom Purwokerto?')) {
+      examConfig = Object.assign({}, DEFAULT_EXAM_CONFIG);
+      try {
+        localStorage.removeItem(STORAGE_CONFIG_KEY);
+      } catch (e) {}
+      openConfigModal();
+      updateHeaderYearBadge();
+      if (activeView === 'denah') {
+        renderCurrentRoom();
+      } else {
+        renderTableView();
+      }
+      showNotification('Pengaturan dikembalikan ke bawaan awal.', 'info');
+    }
+  }
+
+  function detectExamMetadataFromFilename(filename) {
+    if (!filename) return null;
+    const meta = {};
+    const fn = filename.toLowerCase();
+
+    // Tahun Ajaran detection
+    if (fn.includes('2627') || fn.includes('2026/2027') || fn.includes('2026-2027')) {
+      meta.academicYear = '2026/2027';
+    } else if (fn.includes('2728') || fn.includes('2027/2028') || fn.includes('2027-2028')) {
+      meta.academicYear = '2027/2028';
+    } else if (fn.includes('2829') || fn.includes('2028/2029') || fn.includes('2028-2029')) {
+      meta.academicYear = '2028/2029';
+    } else if (fn.includes('2930') || fn.includes('2029/2030') || fn.includes('2029-2030')) {
+      meta.academicYear = '2029/2030';
+    } else {
+      const yearMatch = filename.match(/(20\d{2})[/-](20\d{2})/);
+      if (yearMatch) {
+        meta.academicYear = `${yearMatch[1]}/${yearMatch[2]}`;
+      }
+    }
+
+    // Semester detection
+    if (fn.includes('genap')) {
+      meta.semester = 'Genap';
+    } else if (fn.includes('ganjil') || fn.includes('gasal')) {
+      meta.semester = 'Ganjil';
+    }
+
+    // Exam Type detection
+    if (fn.includes('psaj')) {
+      meta.examType = 'PSAJ';
+      meta.examShortCode = 'PSAJ';
+      meta.examTitle = 'DENAH TEMPAT DUDUK PESERTA PSAJ';
+      meta.examSubtitle = `PENILAIAN SUMATIF AKHIR JENJANG (KELAS XII) • TAHUN PELAJARAN ${meta.academicYear || examConfig.academicYear}`;
+    } else if (fn.includes('psts')) {
+      meta.examType = 'PSTS';
+      meta.examShortCode = 'PSTS';
+      meta.examTitle = 'DENAH TEMPAT DUDUK PESERTA PSTS';
+      meta.examSubtitle = `PENILAIAN SUMATIF TENGAH SEMESTER (${(meta.semester || examConfig.semester).toUpperCase()}) • TAHUN PELAJARAN ${meta.academicYear || examConfig.academicYear}`;
+    } else if (fn.includes('psas')) {
+      meta.examType = 'PSAS';
+      meta.examShortCode = 'PSAS';
+      meta.examTitle = 'DENAH TEMPAT DUDUK PESERTA PSAS';
+      meta.examSubtitle = `PENILAIAN SUMATIF AKHIR SEMESTER (${(meta.semester || examConfig.semester).toUpperCase()}) • TAHUN PELAJARAN ${meta.academicYear || examConfig.academicYear}`;
+    } else if (fn.includes('pts')) {
+      meta.examType = 'PTS';
+      meta.examShortCode = 'PTS';
+      meta.examTitle = 'DENAH TEMPAT DUDUK PESERTA PTS';
+      meta.examSubtitle = `PENILAIAN TENGAH SEMESTER (${(meta.semester || examConfig.semester).toUpperCase()}) • TAHUN PELAJARAN ${meta.academicYear || examConfig.academicYear}`;
+    }
+
+    return Object.keys(meta).length > 0 ? meta : null;
   }
 
   function setZoom(val) {
@@ -405,25 +763,47 @@
     // Build HTML for Room
     let html = `
       <div class="room-sheet ${isBatch ? 'room-print-page' : ''} ${isSafFocused ? 'room-sheet-saf-focused' : ''}" id="room-sheet-${currentRoom.code.replace(/\s+/g, '-')}">
-        <!-- KOP UJIAN -->
-        <div class="exam-kop">
-          <h2 class="kop-title">DENAH TEMPAT DUDUK PESERTA PSTS</h2>
-          <p class="kop-subtitle">PENILAIAN SUMATIF TENGAH SEMESTER • TAHUN AJARAN 2026/2027</p>
+        <!-- KOP UJIAN RESMI TELKOM SCHOOLS -->
+        <div class="exam-kop official-kop">
+          <div class="kop-header-layout">
+            ${examConfig.showLogo ? `
+              <div class="kop-logo-wrapper">
+                <img src="assets/Logo-SMK-Telkom-Purwokerto-768x220.png" alt="Logo SMK Telkom Purwokerto" class="kop-school-logo">
+              </div>
+            ` : ''}
+            <div class="kop-text-wrapper">
+              <div class="kop-org-title">${escapeHtml(examConfig.foundationName)}</div>
+              <div class="kop-school-name">${escapeHtml(examConfig.schoolName)}</div>
+              <div class="kop-exam-title">${escapeHtml(examConfig.examTitle)}</div>
+              <div class="kop-exam-sub">${escapeHtml(examConfig.examSubtitle)}</div>
+              <div class="kop-address-text">${escapeHtml(examConfig.schoolAddress)}</div>
+            </div>
+            <div class="kop-room-badge-wrap">
+              <div class="kop-room-badge-large">
+                <span class="kr-label">RUANG UJIAN</span>
+                <span class="kr-code">${escapeHtml(currentRoom.code)}</span>
+                <span class="kr-subname">${escapeHtml(currentRoom.nama_ruang || '')}</span>
+              </div>
+            </div>
+          </div>
+          <div class="kop-divider-double"></div>
+
+          <!-- META INFORMASI RUANG -->
           <div class="kop-meta-bar">
             <div class="meta-pill highlight">
-              <strong>RUANG:</strong> <span>${currentRoom.no_ruang || currentRoom.code}</span>
+              <strong>RUANG:</strong> <span>${escapeHtml(currentRoom.no_ruang || currentRoom.code)} (${escapeHtml(currentRoom.nama_ruang || '-')})</span>
+            </div>
+            <div class="meta-pill pill-class-left">
+              <strong>KELAS KIRI:</strong> <span>${escapeHtml(currentRoom.class_left || '-')} (${studentsLeft.length} Siswa)</span>
+            </div>
+            <div class="meta-pill pill-class-right">
+              <strong>KELAS KANAN:</strong> <span>${escapeHtml(currentRoom.class_right || 'KOSONG')} (${studentsRight.length} Siswa)</span>
             </div>
             <div class="meta-pill">
-              <strong>NAMA RUANG:</strong> <span>${currentRoom.nama_ruang || '-'}</span>
+              <strong>KAPASITAS:</strong> <span>${currentRoom.total_students} Siswa (${totalDesks} Meja)</span>
             </div>
-            <div class="meta-pill">
-              <strong>KELAS KIRI:</strong> <span>${currentRoom.class_left || '-'} (${studentsLeft.length} Siswa)</span>
-            </div>
-            <div class="meta-pill">
-              <strong>KELAS KANAN:</strong> <span>${currentRoom.class_right || 'KOSONG'} (${studentsRight.length} Siswa)</span>
-            </div>
-            <div class="meta-pill">
-              <strong>TOTAL PESERTA:</strong> <span>${currentRoom.total_students} Siswa (${totalDesks} Meja)</span>
+            <div class="meta-pill pill-period">
+              <strong>PERIODE:</strong> <span>T.A. ${escapeHtml(examConfig.academicYear)} • ${escapeHtml(examConfig.semester)}</span>
             </div>
           </div>
         </div>
@@ -514,24 +894,25 @@
         <!-- FOOTER & TANDA TANGAN UJIAN -->
         <div class="exam-signature-area">
           <div class="exam-rules-note">
-            <strong>TATA TERTIB PESERTA PSTS:</strong>
+            <strong>TATA TERTIB PESERTA UJIAN:</strong>
             <ol>
-              <li>Siswa duduk sesuai denah dan nomor urut presensi yang telah ditentukan panitia.</li>
-              <li>Dilarang menukar posisi tempat duduk tanpa izin Pengawas Ruang.</li>
-              <li>Tas, buku, dan gawai/HP diletakkan di depan kelas di bawah papan tulis.</li>
+              ${examConfig.examRules.map(rule => `<li>${escapeHtml(rule)}</li>`).join('')}
             </ol>
           </div>
 
-          <div class="signature-boxes">
-            <div class="sig-col">
-              <div class="sig-title">Pengawas Ruang 1</div>
-              <div class="sig-line"></div>
-              <div class="sig-nip">NIP. .....................................</div>
-            </div>
-            <div class="sig-col">
-              <div class="sig-title">Pengawas Ruang 2</div>
-              <div class="sig-line"></div>
-              <div class="sig-nip">NIP. .....................................</div>
+          <div class="signature-date-group">
+            <div class="sig-location-date">${escapeHtml(examConfig.locationDate)}</div>
+            <div class="signature-boxes">
+              <div class="sig-col">
+                <div class="sig-title">${escapeHtml(examConfig.supervisor1Title)}</div>
+                <div class="sig-line"></div>
+                <div class="sig-nip">${escapeHtml(examConfig.supervisor1Nip)}</div>
+              </div>
+              <div class="sig-col">
+                <div class="sig-title">${escapeHtml(examConfig.supervisor2Title)}</div>
+                <div class="sig-line"></div>
+                <div class="sig-nip">${escapeHtml(examConfig.supervisor2Nip)}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -604,9 +985,10 @@
       <div class="table-view-card">
         <div class="table-header-title">
           <div>
+            <div class="table-school-tag">${escapeHtml(examConfig.schoolName)} • T.A. ${escapeHtml(examConfig.academicYear)} (${escapeHtml(examConfig.semester)})</div>
             <h2>Daftar Peserta & Presensi Ruang ${escapeHtml(currentRoom.code)} (${escapeHtml(currentRoom.nama_ruang || '-')})</h2>
             <p style="font-size: 0.85rem; color: #64748b;">
-              ${escapeHtml(currentRoom.class_left)} (${studentsLeft.length}) & ${escapeHtml(currentRoom.class_right || 'Kosong')} (${studentsRight.length}) • Total: ${currentRoom.total_students} Siswa
+              ${escapeHtml(currentRoom.class_left)} (${studentsLeft.length} Siswa) & ${escapeHtml(currentRoom.class_right || 'Kosong')} (${studentsRight.length} Siswa) • Total: ${currentRoom.total_students} Siswa • ${escapeHtml(examConfig.examTitle)}
             </p>
           </div>
           <button class="btn btn-primary" onclick="window.print()">
@@ -878,7 +1260,7 @@
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function (evt) {
+    reader.onload = function(evt) {
       try {
         const data = new Uint8Array(evt.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
@@ -892,10 +1274,20 @@
 
         roomsData = parsedRooms;
         currentRoomIndex = 0;
+
+        // Deteksi otomatis tahun ajaran, semester, dan jenis ujian dari nama file Excel
+        const detectedMeta = detectExamMetadataFromFilename(file.name);
+        if (detectedMeta) {
+          saveExamConfig(detectedMeta);
+        }
+
         updateRoomSelectorUI();
         renderCurrentRoom();
 
-        showNotification(`Berhasil memuat ${parsedRooms.length} ruangan dari file: ${file.name}!`, 'success');
+        const detectedInfo = detectedMeta
+          ? ` (T.A. ${detectedMeta.academicYear || examConfig.academicYear} • ${detectedMeta.semester || examConfig.semester} ${detectedMeta.examShortCode || ''})`
+          : '';
+        showNotification(`Berhasil memuat ${parsedRooms.length} ruangan dari file: ${file.name}${detectedInfo}!`, 'success');
       } catch (err) {
         console.error('Error parsing excel:', err);
         alert('Terjadi kesalahan saat memproses file Excel: ' + err.message);
